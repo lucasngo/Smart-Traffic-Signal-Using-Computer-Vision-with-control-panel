@@ -1,0 +1,299 @@
+{% load static %}
+<html>
+    <head>
+        <link href="https://fonts.googleapis.com/css?family=Roboto:400,700" rel="stylesheet" />
+        <!-- <link href="mystyle.css" rel="stylesheet" /> -->
+        <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+        <script type="text/javascript">
+            
+            
+        
+
+        const chatSocket = new WebSocket(
+            'ws://'
+            + window.location.host
+            + '/ws/control/'
+            
+        ); 
+        
+        chatSocket.onopen = function(e){
+            console.log('open',e)
+            /*
+            document.getElementById('auto').onclick=function(){
+                chatSocket.send(JSON.stringify({
+                    'use_algo':true
+                
+                }))
+                
+            }
+            document.getElementById('manual').onclick= function(){
+                chatSocket.send(JSON.stringify({
+                    'use_algo':false
+                }))
+            }
+            */
+            console.log('it start running')
+            chatSocket.send('message')
+        }; 
+        chatSocket.onmessage = function(e) {
+            console.log('message',e);
+            
+            const data =JSON.parse(e.data);
+            const lane=["A","B","C","D"];
+            document.getElementById(data.green_at[0].concat("_signal")).style.background = "green"
+            document.getElementById(data.green_at[1].concat("_signal")).style.background = "green"
+            document.getElementById(data.green_at[0].concat("_times")).innerHTML=data.times
+            document.getElementById(data.green_at[1].concat("_times")).innerHTML=data.times
+            document.getElementById('algo_tag').innerHTML=data.algo
+            if (data.times<=1){
+                document.getElementById(data.green_at[0].concat("_signal")).style.background = 'red'
+                document.getElementById(data.green_at[1].concat("_signal")).style.background = 'red'
+                document.getElementById(data.green_at[0].concat("_times")).innerHTML=0
+                document.getElementById(data.green_at[1].concat("_times")).innerHTML=0
+                
+            }
+            for (i=0;i<lane.length;i++){
+                for (j=0;j<2;j++){
+                    for (k=0;k<2;k++){
+                        console.log(lane[i]+'['+j+']['+'k'+']')
+                        document.getElementById(lane[i]+'['+j+']['+k+']').innerHTML=Math.round(data.traffic[lane[i]][j][k])
+                    }
+                }
+                
+            }
+            
+        };
+
+        chatSocket.onclose = function(e) {
+            console.error('Chat socket closed unexpectedly');
+        };
+            
+            
+        </script>
+        <title>CONTROL PANEL</title>
+        <style>
+            .straight { grid-area: straight; }
+            .right { grid-area: right; }
+            .car { grid-area: car; }
+            .truck { grid-area: truck; }
+            .num_car { grid-area: num_car; }
+            .num_truck {grid-area: num_truck;}
+            .car_right{grid-area: car_right;}
+            .truck_right{grid-area: truck_right;}
+            .num_car_right {grid-area: num_car_right;}
+            .num_truck_right {grid-area: num_truck_right;}
+            .red {
+                height: 25px;
+                width: 25px;
+                background: rgb(221, 13, 13);
+                border-radius: 50%;
+                display: inline-block;
+              }
+
+            .green {
+                height: 25px;
+                width: 25px;
+                background-color: rgb(29, 206, 29);
+                border-radius: 50%;
+                display: inline-block;
+            }
+            .containbox {
+                width: 400px;
+                height:250px;
+                border: 1px solid black;
+                border-radius: 5px;
+            }
+
+            .seperate {
+                height:2px;
+                position: relative;
+                border-width: 1px;
+                color:gray;
+                top:50%;
+
+            }
+            .grid-container {
+                display: grid;
+                grid-template-areas:
+                  'straight straight straight car car num_car '
+                  'straight straight straight truck truck num_truck'
+                  'right right right  car_right car_right num_car_right'
+                  'right right right truck_right truck_right num_truck_right';
+                grid-gap: 2px;
+                background-color: #8c9daa;
+                padding: 10px;
+                width:30%
+              }
+            .grid-container > div {
+                background-color: rgba(255, 255, 255, 0.8);
+                text-align: center;
+                padding: 0px ;
+                font-size: 30px;
+              }
+        </style>
+    </head>
+    <body>
+        
+        <div class="w3-top" style="background-image: url('./static/signal.jpg')">
+            <div class="w3-bar w3-white w3-wide w3-padding w3-card">
+                <div class="w3-display-middle w3-margin-top w3-center">
+                    <h1 class="w3-xxlarge w3-text-white"><span class="w3-padding w3-black w3-opacity-min">Smart Traffic signal control panel</h1>
+                
+                    </div>
+                <a class="w3-right w3-button w3-blue" href="{% url 'logout' %}">Logout</a>
+              <h1 class="w3-center"></h1>
+              
+              <img style="width:100%;height:50px" src="{% static 'background.png' %}">
+            </div>
+        </div>                                      
+        
+        <h1>Welcome to the website</h1>
+        <br>
+        <br>
+        <br>
+        <br>
+        <div class=" w3-container" style="position:relative;left:80%">
+            
+            <!-- <button class="w3-button w3-blue" id='auto'>Automatic</button>
+            <button class="w3-button w3-blue" id='manual'>Manual</button> -->
+            <h3>Mode:<Span id="algo_tag">algo1</Span></h5>
+          </div>
+
+        
+        <div class="grid-container" style="position: relative;left:35%;">
+            <div class='straight'>
+                <span>Straight</span>
+                <span class='red' id="B[0]_signal"></span>
+                <br>
+                <span id="B[0]_times">(0)</span>
+            </div>
+            <div class="right">
+                <span>Right</span>
+                <span class='red' id="B[1]_signal"></span>
+                <br>
+                <span id="B[1]_times">(0)</span>
+            </div>
+            <div class="car">
+                <img src="https://img.icons8.com/plasticine/56/fa314a/car--v2.png"/>
+            </div>  
+            <div class="truck">
+                <img src="https://img.icons8.com/color/56/fa314a/truck--v2.png"/>
+            </div>
+            <div class="num_car" id="B[0][0]">0</div>
+            <div class='num_truck' id="B[0][1]">0</div>
+            <div class='num_car_right' id="B[1][0]">0</div>
+            <div class='num_truck_right' id="B[1][1]">0</div>
+            <div class='car_right'>
+                <img src="https://img.icons8.com/plasticine/56/fa314a/car--v2.png"/>
+            </div>
+            <div class='truck_right'>
+                <img src="https://img.icons8.com/color/56/fa314a/truck--v2.png"/>
+            </div>
+        </div>
+        <br>
+        
+        <div class="row">
+            <div class="grid-container" style="position: relative;left:5%;">
+                <div class='straight'>
+                    <span>Straight</span>
+                    <span class='red' id="C[0]_signal"></span>
+                    <br>
+                    <span id="C[0]_times">(0)</span>
+                </div>
+                <div class="right">
+                    <span>Right</span>
+                    <span class='red' id="C[1]_signal"></span>
+                    <br>
+                    <span id="C[1]_times">(0)</span>
+                </div>
+                <div class="car">
+                    <img src="https://img.icons8.com/plasticine/56/fa314a/car--v2.png"/>
+                </div>  
+                <div class="truck">
+                    <img src="https://img.icons8.com/color/56/fa314a/truck--v2.png"/>
+                </div>
+                <div class="num_car" id="C[0][0]">0</div>
+                <div class='num_truck' id="C[0][1]">0</div>
+                <div class='num_car_right' id="C[1][0]">0</div>
+                <div class='num_truck_right' id="C[1][1]">0</div>
+                <div class='car_right'>
+                    <img src="https://img.icons8.com/plasticine/56/fa314a/car--v2.png"/>
+                </div>
+                <div class='truck_right'>
+                    <img src="https://img.icons8.com/color/56/fa314a/truck--v2.png"/>
+                </div>
+            </div>
+
+            <div class="grid-container" style="position: relative;left:35%;">
+                <div class='straight'>
+                    <span>Straight</span>
+                    <span class='red' id="D[0]_signal"></span>
+                    <br>
+                    <span id="D[0]_times">(0)</span>
+                </div>
+                <div class="right">
+                    <span>Right</span>
+                    <span class='red' id="D[1]_signal"></span>
+                    <br>
+                    <span id="D[1]_times">(0)</span>
+                </div>
+                <div class="car">
+                    <img src="https://img.icons8.com/plasticine/56/fa314a/car--v2.png"/>
+                </div>  
+                <div class="truck">
+                    <img src="https://img.icons8.com/color/56/fa314a/truck--v2.png"/>
+                </div>
+                <div class="num_car" id="D[0][0]">0</div>
+                <div class='num_truck' id="D[0][1]">0</div>
+                <div class='num_car_right' id="D[1][0]">0</div>
+                <div class='num_truck_right' id="D[1][1]">0</div>
+                <div class='car_right'>
+                    <img src="https://img.icons8.com/plasticine/56/fa314a/car--v2.png"/>
+                </div>
+                <div class='truck_right'>
+                    <img src="https://img.icons8.com/color/56/fa314a/truck--v2.png"/>
+                </div>
+            </div>
+        </div>
+        
+        <br>
+
+        <div class="grid-container" style="position: relative;left:35%;">
+            <div class='straight'>
+                <span>Straight</span>
+                <span class='red' id="A[0]_signal"></span>
+                <br>
+                <span id="A[0]_times">(0)</span>
+            </div>
+            <div class="right">
+                <span>Right</span>
+                <span class='red' id="A[1]_signal"></span>
+                <br>
+                <span id="A[1]_times">(0)</span>
+            </div>
+            <div class="car">
+                <img src="https://img.icons8.com/plasticine/56/fa314a/car--v2.png"/>
+            </div>  
+            <div class="truck">
+                <img src="https://img.icons8.com/color/56/fa314a/truck--v2.png"/>
+            </div>
+            <div class="num_car" id="A[0][0]">0</div>
+            <div class='num_truck' id="A[0][1]">0</div>
+            <div class='num_car_right' id="A[1][0]">0</div>
+            <div class='num_truck_right' id="A[1][1]">0</div>
+            <div class='car_right'>
+                <img src="https://img.icons8.com/plasticine/56/fa314a/car--v2.png"/>
+            </div>
+            <div class='truck_right'>
+                <img src="https://img.icons8.com/color/56/fa314a/truck--v2.png"/>
+            </div>
+        </div>
+        
+    
+
+        
+    </body>
+
+</html>
