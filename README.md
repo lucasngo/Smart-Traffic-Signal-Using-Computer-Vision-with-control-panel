@@ -1,6 +1,5 @@
 # Smart-Traffic-Light-Using-Computer-Vision-with-control-panel
 vehicle_counting is to store car counting model
-	+ ivy is the old model
 	+standard is the new model and used
 
 signal_control_panel is the Django web app. Inside that folder, go inside control panel, the file base.py is used to import written function and simulation
