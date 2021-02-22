@@ -37,7 +37,9 @@ pip install -r requirements.txt
 (pip3 for Mac OS)
 
 - Step 4: you can actually run the model by running 
- ```python cars.py
+ ```
+ python cars.py
+ 
  ```
  ( python3 for Mac OS )
 
